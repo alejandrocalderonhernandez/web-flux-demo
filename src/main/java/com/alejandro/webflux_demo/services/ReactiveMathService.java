@@ -1,6 +1,7 @@
 package com.alejandro.webflux_demo.services;
 
 import com.alejandro.webflux_demo.dto.MathResponse;
+import com.alejandro.webflux_demo.dto.MultiplyRequest;
 import com.alejandro.webflux_demo.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,23 @@ public class ReactiveMathService {
                 .doOnNext(i -> Utils.sleepSeconds(1))
                 .doOnNext(i -> log.info("Reactive service math :" + i))
                 .map(i -> MathResponse.builder().date(LocalDateTime.now()).output(i * input).build());
+    }
+
+    public Mono<MathResponse> multiply(Mono<MultiplyRequest> request) {
+        return request
+                .map(r -> MathResponse.builder()
+                    .date(LocalDateTime.now())
+                    .output(r.getA() * r.getB())
+                    .build());
+    }
+
+    public Mono<Double> calculator(Integer a , Integer b, String operationType) {
+        switch (operationType) {
+            case "+": return Mono.just((double) (a + b));
+            case "-": return Mono.just((double) (a - b));
+            case "*": return Mono.just((double) (a * b));
+            case "/": return Mono.just((double) (a / b));
+            default: throw  new IllegalArgumentException();
+        }
     }
 }
